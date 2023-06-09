@@ -5,7 +5,14 @@ export default function Locations() {
   const [data, setData] = useState([]);
 
 function getDataFromSnowflake() {
-  fetch('https://kpb58668.snowflakecomputing.com/api/v2/statements', {
+  /**
+   * If you are located in us-west region, Update SNOWFLAKE_ACCOUNT_IDENTIFIER with your Snowflake Account 
+   * (or) If you are located outside the us-west region, Update SNOWFLAKE_ACCOUNT_IDENTIFIER as ‘.'. 
+   * To get the snowflake_account value from Snowflake, run SELECT CURRENT_ACCOUNT() in Snowsight. 
+   * To get the region value from Snowflake, run SELECT CURRENT_REGION() in Snowsight. 
+   * SNOWFLAKE_ACCOUNT_IDENTIFIER and SNOWFLAKE_ACCOUNT would be same for us-west.
+   */
+  fetch('https://<SNOWFLAKE ACCOUNT IDENTIFIER>.snowflakecomputing.com/api/v2/statements', {
       method: 'POST',
       headers: {
       Accept: 'application/json',
@@ -14,21 +21,12 @@ function getDataFromSnowflake() {
       Authorization: 'Bearer ' + bearerToken()
       },
       body: JSON.stringify({
-      "statement": "SELECT top 50 date, shift, city,  location_name, street_address, " + 
-                    "udf_predict_location_sales_prod(MONTH, DAY_OF_WEEK, LATITUDE, LONGITUDE," +
-                      "COUNT_LOCATIONS_WITHIN_HALF_MILE, CITY_POPULATION, AVG_LOCATION_SHIFT_SALES, SHIFT) " +
-                    "AS predicted_shift_sales " + 
-                    "FROM frostbyte_tasty_bytes.analytics.shift_features " +
-                    "where shift = " + 0 + " " +
-                    "and city = (select PRIMARY_CITY " +
-                      "from frostbyte_tasty_bytes.raw_pos.truck " +
-                      "where truck_id = "+ 256 + " ) " +
-                    "order by predicted_shift_sales desc;",
+      "statement": "<SQL Query>",
       "timeout": 1200,
-      "database": "FROSTBYTE_TASTY_BYTES",
-      "schema": "ANALYTICS",
-      "warehouse": "TASTY_DATA_APP_WH",
-      "role": "TASTY_DATA_APP_TEST"
+      "database": "<DATABASE>",
+      "schema": "<SCHEMA>",
+      "warehouse": "<WAREHOUSE>",
+      "role": "<ROLE>"
       }),
     }).then(response => response.json()).then((json) => { console.error(json);setData(json.data)});
 }
